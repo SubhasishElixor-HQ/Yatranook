@@ -1,0 +1,6 @@
+# Example only: run your TLS ingress (Caddy) on the external Docker network
+# named `edge`, then proxy the public domain to the Yatranook web service.
+your-domain.example.com {
+    encode zstd gzip
+    reverse_proxy web:80
+}

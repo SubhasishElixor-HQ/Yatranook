@@ -1,0 +1,1 @@
+"""Yatranook API application."""

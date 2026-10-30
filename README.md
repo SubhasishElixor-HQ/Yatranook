@@ -87,6 +87,10 @@ uv run python -m app.db.seed
 uv run uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 ```
 
+The API includes an `apps/api/.python-version` pin for Python 3.12. If an existing
+virtual environment was created with another interpreter, run `uv sync --extra dev`
+from `apps/api` to recreate it before starting the server.
+
 Frontend (from `apps/web`):
 
 ```bash
