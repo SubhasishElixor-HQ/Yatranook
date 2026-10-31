@@ -1,0 +1,50 @@
+[
+  {
+    "place": "Jagannath Temple",
+    "destination": "Puri",
+    "district": "Puri",
+    "category": "Religious and heritage",
+    "content": "The Jagannath Temple is a major Hindu temple in Puri, Odisha, dedicated to Lord Jagannath. It is closely associated with the annual Rath Yatra festival. Visitors should check current temple entry rules, timings, and advisories through official temple sources before travelling.",
+    "source": "Yatranook starter knowledge sample - verify with official sources"
+  },
+  {
+    "place": "Puri Beach",
+    "destination": "Puri",
+    "district": "Puri",
+    "category": "Beach",
+    "content": "Puri Beach is a popular coastal destination in the city of Puri, Odisha. Visitors come for the seafront, local food stalls, and sunrise or sunset views. Sea conditions can change, so visitors should follow local lifeguard and administration advice.",
+    "source": "Yatranook starter knowledge sample - verify with official sources"
+  },
+  {
+    "place": "Konark Sun Temple",
+    "destination": "Konark",
+    "district": "Puri",
+    "category": "UNESCO heritage and architecture",
+    "content": "The Konark Sun Temple is a thirteenth-century temple in Konark, Odisha, designed in the form of the chariot of the Sun God. It is recognised as a UNESCO World Heritage Site. Visitors should check the Archaeological Survey of India or official tourism sources for current visitor information.",
+    "source": "Yatranook starter knowledge sample - verify with official sources"
+  },
+  {
+    "place": "Lingaraj Temple",
+    "destination": "Bhubaneswar",
+    "district": "Khordha",
+    "category": "Religious and heritage",
+    "content": "Lingaraj Temple is an important historic Hindu temple in Bhubaneswar, Odisha. It is dedicated to Lord Shiva and is a notable example of Kalinga-style temple architecture. Entry arrangements can vary, and visitors should verify current rules before visiting.",
+    "source": "Yatranook starter knowledge sample - verify with official sources"
+  },
+  {
+    "place": "Dhauli Shanti Stupa",
+    "destination": "Dhauli, near Bhubaneswar",
+    "district": "Khordha",
+    "category": "History and peace memorial",
+    "content": "Dhauli is associated with the Kalinga War and Emperor Ashoka's change in outlook after the war. The Shanti Stupa at Dhauli is a prominent peace monument located near Bhubaneswar in Odisha.",
+    "source": "Yatranook starter knowledge sample - verify with official sources"
+  },
+  {
+    "place": "Chilika Lake",
+    "destination": "Chilika region",
+    "district": "Puri, Khordha and Ganjam region",
+    "category": "Lake and wildlife",
+    "content": "Chilika is a large brackish water lagoon on the coast of Odisha. It is known for its biodiversity and migratory birds. It spans parts of Puri, Khordha and Ganjam districts. Boat services, access points, and wildlife rules should be checked with local authorities before a visit.",
+    "source": "Yatranook starter knowledge sample - verify with official sources"
+  }
+]
