@@ -1,8 +1,23 @@
+
 import { test, expect } from '@playwright/test';
 
 test('landing page opens and can start trip planning', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByText('Your journey, thoughtfully planned.')).toBeVisible();
+
+  // Verify landing page heading.
+  await expect(
+    page.getByRole('heading', {
+      name: /your journey, thoughtfully planned/i,
+    }),
+  ).toBeVisible();
+
+  // Navigate to trip planner.
   await page.getByRole('link', { name: /plan a trip/i }).first().click();
-  await expect(page.getByText('Let’s plan your next journey')).toBeVisible();
+
+  // Verify trip planner heading.
+  await expect(
+    page.getByRole('heading', {
+      name: /let’s plan your next journey/i,
+    }),
+  ).toBeVisible();
 });
