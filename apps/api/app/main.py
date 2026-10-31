@@ -42,7 +42,10 @@ async def request_context(request: Request, call_next):
         response = await call_next(request)
     except Exception:
         logger.exception("Unhandled request exception", extra={"request_id": request_id})
-        response = JSONResponse(status_code=500, content={"detail": "An unexpected server error occurred", "request_id": request_id})
+        response = JSONResponse(
+            status_code=500,
+            content={"detail": "An unexpected server error occurred", "request_id": request_id},
+        )
     elapsed_ms = round((time.perf_counter() - started) * 1000, 2)
     response.headers["X-Request-ID"] = request_id
     response.headers["X-Content-Type-Options"] = "nosniff"
@@ -50,13 +53,26 @@ async def request_context(request: Request, call_next):
     if settings.is_production:
         response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
         response.headers["Content-Security-Policy"] = "default-src 'none'; frame-ancestors 'none'"
-    logger.info("request completed", extra={"request_id": request_id, "method": request.method, "path": request.url.path, "status": response.status_code, "elapsed_ms": elapsed_ms})
+    logger.info(
+        "request completed",
+        extra={
+            "request_id": request_id,
+            "method": request.method,
+            "path": request.url.path,
+            "status": response.status_code,
+            "elapsed_ms": elapsed_ms,
+        },
+    )
     return response
 
 
 @app.get("/", tags=["system"])
 def root() -> dict:
-    return {"service": "yatranook-api", "status": "ok", "docs": "/docs" if not settings.is_production else "disabled"}
+    return {
+        "service": "yatranook-api",
+        "status": "ok",
+        "docs": "/docs" if not settings.is_production else "disabled",
+    }
 
 
 @app.get("/healthz", tags=["health"])

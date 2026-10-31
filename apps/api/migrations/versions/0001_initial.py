@@ -3,6 +3,7 @@
 Revision ID: 0001_initial
 Revises:
 """
+
 from alembic import op
 import sqlalchemy as sa
 from pgvector.sqlalchemy import Vector
@@ -23,8 +24,12 @@ def upgrade() -> None:
         sa.Column("full_name", sa.String(160), nullable=False),
         sa.Column("password_hash", sa.String(255), nullable=False),
         sa.Column("is_active", sa.Boolean(), nullable=False, server_default=sa.true()),
-        sa.Column("created_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()),
-        sa.Column("updated_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()),
+        sa.Column(
+            "created_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()
+        ),
+        sa.Column(
+            "updated_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()
+        ),
     )
     op.create_index("ix_users_email", "users", ["email"], unique=True)
     op.create_table(
@@ -44,8 +49,12 @@ def upgrade() -> None:
         sa.Column("source_name", sa.String(180), nullable=True),
         sa.Column("source_url", sa.Text(), nullable=True),
         sa.Column("verified_at", sa.DateTime(timezone=True), nullable=True),
-        sa.Column("created_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()),
-        sa.Column("updated_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()),
+        sa.Column(
+            "created_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()
+        ),
+        sa.Column(
+            "updated_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()
+        ),
     )
     op.create_index("ix_destinations_name", "destinations", ["name"])
     op.create_index("ix_destinations_location", "destinations", ["location"])
@@ -60,13 +69,22 @@ def upgrade() -> None:
         sa.Column("source_url", sa.Text(), nullable=True),
         sa.Column("metadata", sa.JSON(), nullable=False, server_default=sa.text("'{}'::json")),
         sa.Column("embedding", Vector(1536), nullable=True),
-        sa.Column("created_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()),
+        sa.Column(
+            "created_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()
+        ),
     )
-    op.execute("CREATE INDEX IF NOT EXISTS ix_tourism_documents_embedding_hnsw ON tourism_documents USING hnsw (embedding vector_cosine_ops)")
+    op.execute(
+        "CREATE INDEX IF NOT EXISTS ix_tourism_documents_embedding_hnsw ON tourism_documents USING hnsw (embedding vector_cosine_ops)"
+    )
     op.create_table(
         "trips",
         sa.Column("id", postgresql.UUID(as_uuid=True), primary_key=True),
-        sa.Column("user_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("users.id", ondelete="CASCADE"), nullable=False),
+        sa.Column(
+            "user_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("users.id", ondelete="CASCADE"),
+            nullable=False,
+        ),
         sa.Column("title", sa.String(180), nullable=False),
         sa.Column("origin", sa.String(220), nullable=False),
         sa.Column("region", sa.String(160), nullable=False, server_default=""),
@@ -78,8 +96,12 @@ def upgrade() -> None:
         sa.Column("itinerary", sa.JSON(), nullable=False, server_default=sa.text("'{}'::json")),
         sa.Column("estimated_total", sa.Numeric(12, 2), nullable=True),
         sa.Column("status", sa.String(24), nullable=False, server_default="draft"),
-        sa.Column("created_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()),
-        sa.Column("updated_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()),
+        sa.Column(
+            "created_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()
+        ),
+        sa.Column(
+            "updated_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()
+        ),
     )
     op.create_index("ix_trips_user_id", "trips", ["user_id"])
     op.create_index("ix_trips_status", "trips", ["status"])

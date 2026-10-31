@@ -17,7 +17,11 @@ def register(payload: RegisterRequest, db: Session = Depends(get_db)) -> User:
     email = str(payload.email).lower()
     if db.scalar(select(User).where(User.email == email)):
         raise HTTPException(status_code=409, detail="An account with this email already exists")
-    user = User(email=email, full_name=payload.full_name.strip(), password_hash=hash_password(payload.password))
+    user = User(
+        email=email,
+        full_name=payload.full_name.strip(),
+        password_hash=hash_password(payload.password),
+    )
     db.add(user)
     db.commit()
     db.refresh(user)
@@ -28,7 +32,11 @@ def register(payload: RegisterRequest, db: Session = Depends(get_db)) -> User:
 def login(payload: LoginRequest, db: Session = Depends(get_db)) -> TokenResponse:
     email = str(payload.email).lower()
     user = db.scalar(select(User).where(User.email == email))
-    if user is None or not user.is_active or not verify_password(payload.password, user.password_hash):
+    if (
+        user is None
+        or not user.is_active
+        or not verify_password(payload.password, user.password_hash)
+    ):
         raise HTTPException(status_code=401, detail="Invalid email or password")
     return TokenResponse(
         access_token=create_access_token(str(user.id)),

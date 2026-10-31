@@ -25,9 +25,18 @@ class DestinationOut(BaseModel):
     @classmethod
     def from_model(cls, item):
         return cls(
-            id=item.id, name=item.name, location=item.location, category=item.category,
-            description=item.description, image=item.image, duration=item.duration,
-            priceLabel=item.price_label, tags=item.tags or [], latitude=item.latitude,
-            longitude=item.longitude, sourceName=item.source_name, sourceUrl=item.source_url,
+            id=item.id,
+            name=item.name,
+            location=item.location,
+            category=item.category,
+            description=item.description,
+            image=item.image,
+            duration=item.duration,
+            priceLabel=item.price_label,
+            tags=item.tags or [],
+            latitude=item.latitude,
+            longitude=item.longitude,
+            sourceName=item.source_name,
+            sourceUrl=item.source_url,
             verifiedAt=item.verified_at,
         )

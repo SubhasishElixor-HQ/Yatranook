@@ -32,7 +32,10 @@ async def retrieve_tourism_context(db: Session, query: str, limit: int = 5) -> l
     try:
         embedding = await create_embedding(query)
     except (httpx.HTTPError, KeyError, IndexError, TypeError, ValueError):
-        logger.warning("Ollama embedding provider unavailable; falling back to keyword retrieval", exc_info=True)
+        logger.warning(
+            "Ollama embedding provider unavailable; falling back to keyword retrieval",
+            exc_info=True,
+        )
 
     if embedding:
         statement = (

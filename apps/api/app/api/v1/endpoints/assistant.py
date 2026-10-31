@@ -2,7 +2,12 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
-from app.schemas.assistant import TripChatRequest, TripChatResponse, TripPlanRequest, TripPlanResponse
+from app.schemas.assistant import (
+    TripChatRequest,
+    TripChatResponse,
+    TripPlanRequest,
+    TripPlanResponse,
+)
 from app.services.assistant import chat_trip, plan_trip
 
 router = APIRouter(prefix="/assistant", tags=["assistant"])

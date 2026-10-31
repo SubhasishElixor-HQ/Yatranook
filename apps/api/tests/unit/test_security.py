@@ -1,4 +1,9 @@
-from app.core.security import create_access_token, hash_password, verify_password, decode_access_token
+from app.core.security import (
+    create_access_token,
+    hash_password,
+    verify_password,
+    decode_access_token,
+)
 
 
 def test_password_hash_round_trip():

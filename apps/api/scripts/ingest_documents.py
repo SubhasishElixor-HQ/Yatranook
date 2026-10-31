@@ -3,6 +3,7 @@
 Expected JSONL fields: title, content, source_name, optional source_url, optional metadata.
 Use only content you have permission to store and retrieve.
 """
+
 import argparse
 import asyncio
 import json
@@ -22,7 +23,9 @@ async def ingest(path: Path) -> int:
             item = json.loads(line)
             required = ("title", "content", "source_name")
             if any(not str(item.get(field, "")).strip() for field in required):
-                raise ValueError(f"Line {line_number}: title, content, and source_name are required")
+                raise ValueError(
+                    f"Line {line_number}: title, content, and source_name are required"
+                )
             content = str(item["content"]).strip()
             embedding = await create_embedding(f"{item['title']}\n{content}")
             document = TourismDocument(
@@ -46,7 +49,9 @@ def main() -> None:
     total = asyncio.run(ingest(args.file))
     print(f"Ingested {total} tourism documents")
     if total:
-        print("Note: Ollama embeddings are generated when the configured Ollama server and model are available; otherwise keyword retrieval is used.")
+        print(
+            "Note: Ollama embeddings are generated when the configured Ollama server and model are available; otherwise keyword retrieval is used."
+        )
 
 
 if __name__ == "__main__":

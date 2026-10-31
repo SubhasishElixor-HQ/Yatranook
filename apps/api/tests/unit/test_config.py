@@ -6,7 +6,9 @@ from app.core.config import Settings
 def production_settings(**overrides) -> Settings:
     values = {
         "app_env": "production",
-        "database_url": "postgresql+psycopg://yatranook:" + ("a" * 48) + "@localhost:5432/yatranook",
+        "database_url": "postgresql+psycopg://yatranook:"
+        + ("a" * 48)
+        + "@localhost:5432/yatranook",
         "jwt_secret": "b" * 64,
         "allowed_hosts": "127.0.0.1,localhost,yatranook.example.com",
         "cors_origins": "https://yatranook.example.com",

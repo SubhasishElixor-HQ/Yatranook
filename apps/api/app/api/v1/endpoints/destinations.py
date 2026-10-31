@@ -21,7 +21,12 @@ def list_destinations(
     if search.strip():
         pattern = f"%{search.strip()}%"
         statement = statement.where(
-            or_(Destination.name.ilike(pattern), Destination.location.ilike(pattern), Destination.description.ilike(pattern), Destination.category.ilike(pattern))
+            or_(
+                Destination.name.ilike(pattern),
+                Destination.location.ilike(pattern),
+                Destination.description.ilike(pattern),
+                Destination.category.ilike(pattern),
+            )
         )
     if region:
         statement = statement.where(Destination.region.ilike(f"%{region.strip()}%"))
