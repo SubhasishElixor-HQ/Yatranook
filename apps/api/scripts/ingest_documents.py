@@ -45,8 +45,8 @@ def main() -> None:
     args = parser.parse_args()
     total = asyncio.run(ingest(args.file))
     print(f"Ingested {total} tourism documents")
-    if total and not __import__("app.core.config", fromlist=["settings"]).settings.openai_api_key:
-        print("Note: no OpenAI key configured; documents were stored without embeddings and keyword retrieval will be used.")
+    if total:
+        print("Note: Ollama embeddings are generated when the configured Ollama server and model are available; otherwise keyword retrieval is used.")
 
 
 if __name__ == "__main__":

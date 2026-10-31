@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { ApiHealth, Destination, RouteMode, RouteOptimizeResult, TripPlanResult, TripRequest } from '../../types';
+import type { ApiHealth, Destination, RouteMode, RouteOptimizeResult, TripChatResult, TripPlanResult, TripRequest } from '../../types';
 import { destinations } from '../../data/demo';
 import { useAuthStore, type SessionUser } from '../../store/useAuthStore';
 
@@ -44,10 +44,32 @@ export async function createTripPlan(input: TripRequest): Promise<TripPlanResult
     const { data } = await api.post<TripPlanResult>('/assistant/plan', input);
     return data;
   }
+
   return {
     mode: 'demo' as const,
     message: `I have your starting point as ${input.origin}, your region as ${input.region || 'flexible'}, and your budget as ₹${input.budget.toLocaleString('en-IN')} ${input.budgetType === 'total' ? 'for the trip' : 'per person'}. A small positive budget is valid. I would compare nearby options first, then build a route that balances distance, time, and cost. This preview uses sample catalogue data; connect FastAPI and verified routing/fare providers for live results.`,
     suggested: destinations.filter((d) => ['Temple', 'Heritage', 'Nature'].includes(d.category)).slice(0, 3),
+  };
+}
+
+export async function chatTrip(input: Omit<TripRequest, 'budget'> & {
+  budget?: number;
+  message: string;
+  history: { role: 'user' | 'assistant'; content: string }[];
+}): Promise<TripChatResult> {
+  if (configuredBaseURL) {
+    const { data } = await api.post<TripChatResult>('/assistant/chat', input, { timeout: 120_000 });
+    return data;
+  }
+  const matches = destinations.filter((destination) => {
+    const text = `${destination.name} ${destination.location} ${destination.category} ${destination.tags.join(' ')}`.toLowerCase();
+    return input.message.toLowerCase().split(/\s+/).some((term) => term.length >= 3 && text.includes(term));
+  }).slice(0, 4);
+  return {
+    mode: 'demo',
+    message: `I can help refine your trip from ${input.origin || 'your starting point'}. ${matches.length ? `Consider ${matches.map((item) => item.name).join(', ')}.` : 'I would compare nearby places first.'} To reduce cost, group nearby stops, avoid backtracking, and compare public or shared transport. This preview does not have live fares or road times.`,
+    suggested: matches,
+    warnings: ['Connect FastAPI for LLM, RAG, live routing, and fare-provider results.'],
   };
 }
 

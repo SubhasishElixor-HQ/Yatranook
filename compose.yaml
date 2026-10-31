@@ -32,10 +32,9 @@ services:
       ACCESS_TOKEN_MINUTES: ${ACCESS_TOKEN_MINUTES:-30}
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173,http://localhost:8080}
       ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost,127.0.0.1}
-      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
-      OPENAI_BASE_URL: ${OPENAI_BASE_URL:-https://api.openai.com/v1}
-      OPENAI_CHAT_MODEL: ${OPENAI_CHAT_MODEL:-gpt-4o-mini}
-      OPENAI_EMBEDDING_MODEL: ${OPENAI_EMBEDDING_MODEL:-text-embedding-3-small}
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+      OLLAMA_CHAT_MODEL: ${OLLAMA_CHAT_MODEL:-qwen2.5-coder:3b}
+      OLLAMA_EMBEDDING_MODEL: ${OLLAMA_EMBEDDING_MODEL:-nomic-embed-text}
       EMBEDDING_DIMENSIONS: ${EMBEDDING_DIMENSIONS:-1536}
       OSRM_BASE_URL: ${OSRM_BASE_URL:-}
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
@@ -51,6 +50,8 @@ services:
       retries: 5
       start_period: 25s
     networks: [yatranook]
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     security_opt:
       - no-new-privileges:true
 

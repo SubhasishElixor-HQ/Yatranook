@@ -60,3 +60,11 @@ export interface TripPlanResult {
   warnings?: string[];
   budget_analysis?: { supplied_budget: number; effective_group_budget: number; currency: string; estimate_status: string; note: string };
 }
+
+export interface TripChatResult {
+  mode: 'live' | 'fallback' | 'demo';
+  message: string;
+  suggested: Destination[];
+  sources?: { title: string; source_name: string; source_url?: string | null; content?: string }[];
+  warnings?: string[];
+}

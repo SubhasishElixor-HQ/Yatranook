@@ -142,10 +142,9 @@ All secrets belong in the root `.env` file or a deployment secret manager. Never
 | `JWT_SECRET` | JWT signing secret; production requires a unique value of at least 32 characters |
 | `CORS_ORIGINS` | Allowed browser origins when frontend and API are served separately |
 | `ALLOWED_HOSTS` | Comma-separated API Host header allowlist in production |
-| `OPENAI_API_KEY` | Optional LLM and embedding provider key |
-| `OPENAI_BASE_URL` | OpenAI-compatible API base URL |
-| `OPENAI_CHAT_MODEL` | Chat model identifier |
-| `OPENAI_EMBEDDING_MODEL` | Embedding model identifier |
+| `OLLAMA_BASE_URL` | Ollama server URL, normally `http://localhost:11434` locally |
+| `OLLAMA_CHAT_MODEL` | Installed Ollama chat model, for example `llama3.2:3b` |
+| `OLLAMA_EMBEDDING_MODEL` | Installed Ollama embedding model; its output must match the configured vector dimension |
 | `EMBEDDING_DIMENSIONS` | Must remain 1536 for the initial migration |
 | `OSRM_BASE_URL` | Optional OSRM-compatible routing endpoint; leave empty for geographic preview only |
 | `WEB_PORT` | Public local port for Nginx |
@@ -181,6 +180,7 @@ Base path: `/api/v1`
 | GET | `/destinations` | Public | Search seed/catalogue destinations |
 | GET | `/destinations/{id}` | Public | Destination details |
 | POST | `/assistant/plan` | Public | Generate a grounded plan suggestion/fallback |
+| POST | `/assistant/chat` | Public | Continue a grounded natural-language travel conversation |
 | POST | `/routes/optimize` | Public | Geographic stop-order preview; optional OSRM route data |
 | GET | `/trips` | Bearer | List current user's saved trips |
 | POST | `/trips` | Bearer | Save a trip |
@@ -191,11 +191,12 @@ Interactive API documentation is available at `/docs` when `APP_ENV=development`
 
 ## AI and RAG behavior
 
-- Without `OPENAI_API_KEY`, the assistant uses a deterministic fallback response and the destination catalogue. It does not claim live AI results.
-- With an OpenAI-compatible key, the assistant can call the configured chat model and embedding model.
+- The assistant uses Ollama's native `/api/chat` and `/api/embed` endpoints. Install and run Ollama locally, then pull the configured models with `ollama pull qwen2.5-coder:3b` and `ollama pull nomic-embed-text`. The default chat model is chosen because it returns concise answers without exposing a reasoning trace.
+- If Ollama is unavailable, the assistant uses a deterministic fallback response and the destination catalogue. It does not claim live AI results.
+- `POST /assistant/chat` accepts the current trip context, a message, and recent conversation history. It returns grounded destination suggestions, retrieved sources, and explicit warnings when live fares or road routes are unavailable.
 - Tourism documents can be ingested from JSONL using `uv run python -m scripts.ingest_documents path/to/file.jsonl` from `apps/api`.
 - Documents should include `title`, `content`, `source_name`, optional `source_url`, and optional `metadata`.
-- The ingestion script stores embeddings when a key is configured; without a key, it stores text for keyword retrieval.
+- The ingestion script stores embeddings when the configured Ollama embedding model is available; otherwise, it stores text for keyword retrieval. The initial pgvector migration requires 1536-dimensional embeddings, so models with another output size intentionally use keyword retrieval.
 - Only ingest content you have permission to store. Curate and verify source quality before displaying it as reliable travel guidance.
 - Retrieval does not guarantee factual correctness. The assistant is instructed not to invent current prices, hours, routes, availability, or booking confirmations.
 

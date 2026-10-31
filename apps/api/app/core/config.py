@@ -17,18 +17,12 @@ class Settings(BaseSettings):
     access_token_minutes: int = Field(default=30, ge=5, le=1440)
     cors_origins: str = "http://localhost:5173,http://localhost:8080"
     allowed_hosts: str = "localhost,127.0.0.1"
-    openai_api_key: SecretStr | None = None
-    openai_base_url: str = "https://api.openai.com/v1"
-    openai_chat_model: str = "gpt-4o-mini"
-    openai_embedding_model: str = "text-embedding-3-small"
+    ollama_base_url: str = "http://host.docker.internal:11434"
+    ollama_chat_model: str = "qwen2.5-coder:3b"
+    ollama_embedding_model: str = "nomic-embed-text"
     embedding_dimensions: int = 1536
     osrm_base_url: str | None = None
     log_level: str = "INFO"
-
-    @field_validator("openai_api_key", mode="before")
-    @classmethod
-    def empty_key_is_none(cls, value):
-        return None if value == "" else value
 
     @model_validator(mode="after")
     def validate_embedding_dimension(self):

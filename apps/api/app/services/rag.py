@@ -11,23 +11,28 @@ logger = logging.getLogger(__name__)
 
 
 async def create_embedding(text: str) -> list[float] | None:
-    api_key = settings.openai_api_key.get_secret_value() if settings.openai_api_key else None
-    if not api_key:
-        return None
-    url = f"{settings.openai_base_url.rstrip('/')}/embeddings"
-    payload = {"model": settings.openai_embedding_model, "input": text, "dimensions": settings.embedding_dimensions}
-    async with httpx.AsyncClient(timeout=20.0) as client:
-        response = await client.post(url, json=payload, headers={"Authorization": f"Bearer {api_key}"})
+    url = f"{settings.ollama_base_url.rstrip('/')}/api/embed"
+    payload = {"model": settings.ollama_embedding_model, "input": text}
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        response = await client.post(url, json=payload)
         response.raise_for_status()
-        return response.json()["data"][0]["embedding"]
+        embedding = response.json()["embeddings"][0]
+        if len(embedding) != settings.embedding_dimensions:
+            logger.warning(
+                "Ollama embedding dimension %s does not match pgvector dimension %s; using keyword retrieval",
+                len(embedding),
+                settings.embedding_dimensions,
+            )
+            return None
+        return embedding
 
 
 async def retrieve_tourism_context(db: Session, query: str, limit: int = 5) -> list[dict]:
     embedding = None
     try:
         embedding = await create_embedding(query)
-    except (httpx.HTTPError, KeyError, ValueError):
-        logger.warning("Embedding provider unavailable; falling back to keyword retrieval", exc_info=True)
+    except (httpx.HTTPError, KeyError, IndexError, TypeError, ValueError):
+        logger.warning("Ollama embedding provider unavailable; falling back to keyword retrieval", exc_info=True)
 
     if embedding:
         statement = (

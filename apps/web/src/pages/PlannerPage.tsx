@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { ArrowRight, Check, Compass, LocateFixed, MapPin, Send, Sparkles, Wallet, Users, CalendarDays, MapPinned } from 'lucide-react';
 import { PageHeading, Button, AssistantBadge, DestinationCard } from '../components/UI';
-import { apiMode, createTripPlan } from '../lib/api/client';
+import { apiMode, chatTrip, createTripPlan } from '../lib/api/client';
 import { useTripStore } from '../store/useTripStore';
 import type { TripRequest } from '../types';
 
@@ -22,7 +22,16 @@ export function PlannerPage() {
     { role: 'assistant', text: 'Hello! I’m here to help shape a journey that fits your time, interests, and budget. Let’s start with where you are.' }
   ]);
   const [error, setError] = useState('');
+  const [chatResult, setChatResult] = useState<Awaited<ReturnType<typeof chatTrip>> | null>(null);
   const mutation = useMutation({ mutationFn: createTripPlan, onSuccess: (result) => { setConversation((items) => [...items, { role: 'assistant', text: result.message }]); } });
+  const chatMutation = useMutation({
+    mutationFn: (input: { message: string; history: { role: 'user' | 'assistant'; content: string }[] }) =>
+      chatTrip({ origin: origin.trim(), region: region.trim(), budget: Number(budget) || undefined, budgetType, travelers: Number(travelers) || 1, duration, interests: selectedInterests, ...input }),
+    onSuccess: (result) => {
+      setChatResult(result);
+      setConversation((items) => [...items, { role: 'assistant', text: result.message }]);
+    },
+  });
 
   const useCurrentLocation = () => {
     setError('');
@@ -52,8 +61,10 @@ export function PlannerPage() {
   const sendMessage = () => {
     const message = chatText.trim();
     if (!message) return;
-    setConversation((items) => [...items, { role: 'user', text: message }, { role: 'assistant', text: 'Thanks. In the connected version, I’ll update the trip context, retrieve relevant destinations, and recalculate the affected itinerary sections. This local preview does not call a live AI model yet.' }]);
+    const history = conversation.map((item) => ({ role: item.role, content: item.text }));
+    setConversation((items) => [...items, { role: 'user', text: message }]);
     setChatText('');
+    chatMutation.mutate({ message, history });
   };
 
   return <div className="page-stack">
@@ -77,16 +88,17 @@ export function PlannerPage() {
       <aside className="planner-assistant-column">
         <section className="assistant-panel">
           <div className="assistant-panel-head"><div className="assistant-avatar"><Sparkles size={17}/></div><div><strong>Yatranook assistant</strong><small><i/> Ready to help</small></div><span className="assistant-mini-tag">AI PLANNER</span></div>
-          <div className="conversation-list">{conversation.map((item, index) => <div key={`${item.role}-${index}`} className={`chat-message ${item.role}`}><div className="chat-bubble">{item.text}</div></div>)}{mutation.isPending && <div className="chat-message assistant"><div className="chat-bubble typing-dots"><i/><i/><i/></div></div>}</div>
+          <div className="conversation-list">{conversation.map((item, index) => <div key={`${item.role}-${index}`} className={`chat-message ${item.role}`}><div className="chat-bubble">{item.text}</div></div>)}{(mutation.isPending || chatMutation.isPending) && <div className="chat-message assistant"><div className="chat-bubble typing-dots"><i/><i/><i/></div></div>}</div>
           <div className="chat-suggestions"><span>TRY ASKING</span><button onClick={() => setChatText('Find affordable places near my starting point')}>Places near me</button><button onClick={() => setChatText('Make the route cheaper with fewer travel hops')}>Reduce travel cost</button></div>
           <div className="chat-input"><input value={chatText} onChange={(e) => setChatText(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') sendMessage(); }} placeholder="Ask or refine your trip..." aria-label="Message Yatranook"/><button onClick={sendMessage} aria-label="Send message"><Send size={17}/></button></div>
-          <div className="demo-caption">{apiMode === 'api' ? 'Connected to the Yatranook planning API · provider capabilities depend on configuration' : 'Local UI preview · Connect FastAPI for backend planning and AI services'}</div>
+          <div className="demo-caption">{apiMode === 'api' ? 'Connected to the Yatranook planning API · LLM, RAG, routing, and fare capabilities depend on configuration' : 'Local UI preview · Connect FastAPI for backend planning and AI services'}</div>
         </section>
         <div className="planner-tip"><div className="tip-icon"><Sparkles size={17}/></div><div><strong>Small budget? That’s okay.</strong><p>We’ll explore nearby places, affordable transport, and shorter routes before suggesting you increase your budget.</p></div></div>
       </aside>
     </div>
     {mutation.isSuccess && mutation.data.warnings?.map((warning) => <div className="inline-alert" role="status" key={warning}>{warning}</div>)}
     {mutation.isSuccess && mutation.data.sources && mutation.data.sources.length > 0 && <section className="panel"><div className="section-title"><div><span className="eyebrow">RETRIEVED KNOWLEDGE</span><h2>Sources used</h2></div></div><div className="tag-row">{mutation.data.sources.map((source) => <span key={`${source.source_name}-${source.title}`}>{source.source_name}: {source.source_url ? <a href={source.source_url} target="_blank" rel="noreferrer">{source.title}</a> : source.title}</span>)}</div></section>}
+    {chatResult?.suggested.length ? <section className="panel"><div className="section-title"><div><span className="eyebrow">CHAT RECOMMENDATIONS</span><h2>Places from this conversation</h2><p>Grounded in the current destination catalogue and retrieved tourism context.</p></div></div><div className="destination-grid">{chatResult.suggested.map((destination) => <DestinationCard key={destination.id} destination={destination}/>)}</div></section> : null}
     {mutation.isSuccess && <section className="planner-results"><div className="section-title"><div><span className="eyebrow">{mutation.data.mode === 'demo' ? 'SAMPLE SUGGESTIONS' : 'DESTINATION MATCHES'}</span><h2>Places to consider</h2><p>{mutation.data.mode === 'demo' ? 'Illustrative options from the local demo dataset, not live availability.' : 'Matches from the current destination catalogue. Verify time-sensitive visitor details before travelling.'}</p></div></div><div className="destination-grid">{mutation.data.suggested.map((destination) => <DestinationCard key={destination.id} destination={destination}/>)}</div></section>}
   </div>;
 }

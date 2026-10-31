@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Globe2, LockKeyhole, UserRound, ShieldCheck, Save } from 'lucide-react';
+import { Bell, Globe2, LockKeyhole, UserRound, ShieldCheck, Save } from 'lucide-react';
 import { PageHeading, Button } from '../components/UI';
 
 export function SettingsPage() {
